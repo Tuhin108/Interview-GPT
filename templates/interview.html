@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InterviewGPT - Interview in Progress</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: white;
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .question-section {
+            display: none;
+            text-align: center;
+        }
+        
+        .question-section.active {
+            display: block;
+        }
+        
+        .question-type {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .question {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .recording-section {
+            margin-bottom: 2rem;
+        }
+        
+        .recording-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .recording-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        
+        .recording-btn.recording {
+            background: #27ae60;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .answer-display {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            min-height: 60px;
+            border: 2px solid #ddd;
+        }
+        
+        .answer-display.has-content {
+            border-color: #27ae60;
+        }
+        
+        .submit-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+        }
+        
+        .submit-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .feedback-section {
+            display: none;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feedback-section.show {
+            display: block;
+        }
+        
+        .score {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feedback-text {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .next-btn {
+            background: #27ae60;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        
+        .next-btn:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            display: none;
+            color: #667eea;
+            margin-top: 1rem;
+        }
+        
+        .error {
+            color: #e74c3c;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .browser-warning {
+            background: #f39c12;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            display: none;
+        }
+        
+        .manual-input {
+            display: none;
+            margin-top: 1rem;
+        }
+        
+        .manual-input textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .manual-input textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .toggle-input {
+            background: #f39c12;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="browser-warning" id="browserWarning">
+        ⚠️ Speech recognition is not supported in your browser. You can still type your answers manually.
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Interview in Progress</h1>
+            <p id="roleDisplay">Role: Loading...</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="question-section active" id="questionSection">
+                <div class="question-type" id="questionType">Loading...</div>
+                <div class="question" id="questionText">Loading question...</div>
+                
+                <div class="recording-section">
+                    <button class="recording-btn" id="recordBtn">🎤 Click to Record Answer</button>
+                    <div class="answer-display" id="answerDisplay">Your answer will appear here...</div>
+                    <button class="toggle-input" id="toggleInput">Type Instead</button>
+                </div>
+                
+                <div class="manual-input" id="manualInput">
+                    <textarea id="manualAnswer" placeholder="Type your answer here..."></textarea>
+                    <button class="submit-btn" id="useTypedAnswer">Use This Answer</button>
+                </div>
+                
+                <button class="submit-btn" id="submitBtn" disabled>Submit Answer</button>
+                
+                <div class="loading" id="loading">
+                    <p>🤖 Evaluating your answer...</p>
+                </div>
+                
+                <div class="error" id="error">
+                    <p>Something went wrong. Please try again.</p>
+                </div>
+                
+                <div class="feedback-section" id="feedbackSection">
+                    <div class="score" id="score">-/10</div>
+                    <div class="feedback-text" id="feedbackText">Feedback will appear here...</div>
+                    <button class="next-btn" id="nextBtn">Next Question</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let answers = [];
+        let role = '';
+        let recognition = null;
+        let isRecording = false;
+        let currentAnswer = '';
+        
+        // Initialize the interview
+        function initInterview() {
+            // Get data from sessionStorage
+            const storedQuestions = sessionStorage.getItem('questions');
+            const storedRole = sessionStorage.getItem('role');
+            const storedCurrentQuestion = sessionStorage.getItem('currentQuestion');
+            const storedAnswers = sessionStorage.getItem('answers');
+            
+            if (!storedQuestions || !storedRole) {
+                alert('No interview data found. Redirecting to home page.');
+                window.location.href = '/';
+                return;
+            }
+            
+            questions = JSON.parse(storedQuestions);
+            role = storedRole;
+            currentQuestionIndex = parseInt(storedCurrentQuestion) || 0;
+            answers = JSON.parse(storedAnswers) || [];
+            
+            // Update display
+            document.getElementById('roleDisplay').textContent = `Role: ${role}`;
+            
+            // Check if interview is complete
+            if (currentQuestionIndex >= questions.length) {
+                window.location.href = '/results';
+                return;
+            }
+            
+            // Initialize speech recognition
+            initSpeechRecognition();
+            
+            // Display current question
+            displayQuestion();
+        }
+        
+        function initSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                document.getElementById('browserWarning').style.display = 'block';
+                document.getElementById('recordBtn').disabled = true;
+                return;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            
+            recognition.onstart = function() {
+                isRecording = true;
+                const recordBtn = document.getElementById('recordBtn');
+                recordBtn.textContent = '🔴 Recording... (Click to Stop)';
+                recordBtn.classList.add('recording');
+            };
+            
+            recognition.onresult = function(event) {
+                let interimTranscript = '';
+                let finalTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                currentAnswer = finalTranscript;
+                const answerDisplay = document.getElementById('answerDisplay');
+                answerDisplay.textContent = finalTranscript + interimTranscript;
+                
+                if (finalTranscript.trim()) {
+                    answerDisplay.classList.add('has-content');
+                    document.getElementById('submitBtn').disabled = false;
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                stopRecording();
+                document.getElementById('error').textContent = 'Speech recognition error. Please try again or type your answer.';
+                document.getElementById('error').style.display = 'block';
+            };
+            
+            recognition.onend = function() {
+                stopRecording();
+            };
+        }
+        
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('questionType').textContent = question.type;
+            document.getElementById('questionText').textContent = question.question;
+            
+            // Update progress bar
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Reset UI
+            document.getElementById('answerDisplay').textContent = 'Your answer will appear here...';
+            document.getElementById('answerDisplay').classList.remove('has-content');
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('feedbackSection').classList.remove('show');
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
+            
+            // Reset manual input
+            document.getElementById('manualInput').style.display = 'none';
+            document.getElementById('manualAnswer').value = '';
+            document.getElementById('toggleInput').textContent = 'Type Instead';
+            
+            currentAnswer = '';
+        }
+        
+        function startRecording() {
+            if (!recognition) {
+                alert('Speech recognition is not available. Please type your answer.');
+                return;
+            }
+            
+            if (!isRecording) {
+                recognition.start();
+            } else {
+                recognition.stop();
+            }
+        }
+        
+        function stopRecording() {
+            isRecording = false;
+            const recordBtn = document.getElementById('recordBtn');
+            recordBtn.textContent = '🎤 Click to Record Answer';
+            recordBtn.classList.remove('recording');
+        }
+        
+        function toggleManualInput() {
+            const manualInput = document.getElementById('manualInput');
+            const toggleBtn = document.getElementById('toggleInput');
+            
+            if (manualInput.style.display === 'none') {
+                manualInput.style.display = 'block';
+                toggleBtn.textContent = 'Use Voice Instead';
+            } else {
+                manualInput.style.display = 'none';
+                toggleBtn.textContent = 'Type Instead';
+            }
+        }
+        
+        function useTypedAnswer() {
+            const typedAnswer = document.getElementById('manualAnswer').value.trim();
+            if (!typedAnswer) {
+                alert('Please type your answer first.');
+                return;
+            }
+            
+            currentAnswer = typedAnswer;
+            const answerDisplay = document.getElementById('answerDisplay');
+            answerDisplay.textContent = typedAnswer;
+            answerDisplay.classList.add('has-content');
+            document.getElementById('submitBtn').disabled = false;
+            
+            // Hide manual input
+            document.getElementById('manualInput').style.display = 'none';
+            document.getElementById('toggleInput').textContent = 'Type Instead';
+        }
+        
+        async function submitAnswer() {
+            if (!currentAnswer.trim()) {
+                alert('Please provide an answer before submitting.');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            
+            try {
+                const response = await fetch('/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: questions[currentQuestionIndex].question,
+                        answer: currentAnswer
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Store the answer and evaluation
+                const answerData = {
+                    question: questions[currentQuestionIndex],
+                    answer: currentAnswer,
+                    feedback: data.feedback,
+                    score: data.score
+                };
+                
+                answers.push(answerData);
+                sessionStorage.setItem('answers', JSON.stringify(answers));
+                
+                // Display feedback
+                displayFeedback(data.feedback, data.score);
+                
+            } catch (err) {
+                console.error('Error:', err);
+                error.textContent = err.message || 'Failed to evaluate answer. Please try again.';
+                error.style.display = 'block';
+                submitBtn.disabled = false;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        function displayFeedback(feedback, score) {
+            document.getElementById('score').textContent = `${score}/10`;
+            document.getElementById('feedbackText').textContent = feedback;
+            document.getElementById('feedbackSection').classList.add('show');
+            
+            // Color code the score
+            const scoreElement = document.getElementById('score');
+            if (score >= 8) {
+                scoreElement.style.color = '#27ae60';
+            } else if (score >= 6) {
+                scoreElement.style.color = '#f39c12';
+            } else {
+                scoreElement.style.color = '#e74c3c';
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestionIndex++;
+            sessionStorage.setItem('currentQuestion', currentQuestionIndex.toString());
+            
+            if (currentQuestionIndex >= questions.length) {
+                // Interview complete, go to results
+                window.location.href = '/results';
+            } else {
+                // Display next question
+                displayQuestion();
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('recordBtn').addEventListener('click', startRecording);
+        document.getElementById('submitBtn').addEventListener('click', submitAnswer);
+        document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+        document.getElementById('toggleInput').addEventListener('click', toggleManualInput);
+        document.getElementById('useTypedAnswer').addEventListener('click', useTypedAnswer);
+        
+        // Initialize when page loads
+        window.addEventListener('load', initInterview);
+        
+        // Handle page refresh/close
+        window.addEventListener('beforeunload', function() {
+            if (recognition && isRecording) {
+                recognition.stop();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InterviewGPT - Interview Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .overall-score {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .performance-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            margin-top: 1rem;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .questions-section {
+            margin-top: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .question-type {
+            background: #667eea;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .question-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background: white;
+            border: 2px solid #ddd;
+        }
+        
+        .question-text {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .answer-section {
+            margin-bottom: 1rem;
+        }
+        
+        .answer-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+        
+        .answer-text {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            color: #666;
+            line-height: 1.6;
+            font-style: italic;
+        }
+        
+        .feedback-section {
+            margin-top: 1rem;
+        }
+        
+        .feedback-text {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+            color: #0d47a1;
+            line-height: 1.6;
+        }
+        
+        .actions {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #ddd;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .no-data h2 {
+            margin-bottom: 1rem;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+            }
+            
+            .header {
+                padding: 1.5rem;
+            }
+            
+            .overall-score {
+                font-size: 2.5rem;
+            }
+            
+            .content {
+                padding: 1.5rem;
+            }
+            
+            .question-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .actions {
+                text-align: center;
+            }
+            
+            .btn {
+                display: block;
+                margin: 0.5rem auto;
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Interview Complete!</h1>
+            <p id="roleDisplay">Role: Loading...</p>
+            <div class="overall-score" id="overallScore">-/10</div>
+            <div class="performance-badge" id="performanceBadge">Calculating...</div>
+        </div>
+        
+        <div class="content">
+            <div id="noData" class="no-data" style="display: none;">
+                <h2>No Interview Data Found</h2>
+                <p>It looks like you haven't completed an interview yet.</p>
+                <a href="/" class="btn btn-primary">Start New Interview</a>
+            </div>
+            
+            <div id="resultsContent">
+                <div class="summary-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgScore">-</div>
+                        <div class="stat-label">Average Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="questionsAnswered">-</div>
+                        <div class="stat-label">Questions Answered</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="topScore">-</div>
+                        <div class="stat-label">Highest Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="strongestArea">-</div>
+                        <div class="stat-label">Strongest Area</div>
+                    </div>
+                </div>
+                
+                <div class="questions-section">
+                    <h2 class="section-title">📋 Question by Question Breakdown</h2>
+                    <div id="questionsList">
+                        <!-- Questions will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <a href="/" class="btn btn-primary">Start New Interview</a>
+            <button onclick="window.print()" class="btn btn-secondary">Print Results</button>
+        </div>
+    </div>
+
+    <script>
+        function initResults() {
+            const storedAnswers = sessionStorage.getItem('answers');
+            const storedRole = sessionStorage.getItem('role');
+            
+            if (!storedAnswers || !storedRole) {
+                document.getElementById('noData').style.display = 'block';
+                document.getElementById('resultsContent').style.display = 'none';
+                return;
+            }
+            
+            const answers = JSON.parse(storedAnswers);
+            const role = storedRole;
+            
+            if (answers.length === 0) {
+                document.getElementById('noData').style.display = 'block';
+                document.getElementById('resultsContent').style.display = 'none';
+                return;
+            }
+            
+            // Update role display
+            document.getElementById('roleDisplay').textContent = `Role: ${role}`;
+            
+            // Calculate statistics
+            const scores = answers.map(a => a.score);
+            const avgScore = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+            const topScore = Math.max(...scores);
+            
+            // Find strongest area
+            const areaScores = {};
+            answers.forEach(answer => {
+                const type = answer.question.type;
+                if (!areaScores[type]) {
+                    areaScores[type] = [];
+                }
+                areaScores[type].push(answer.score);
+            });
+            
+            let strongestArea = '';
+            let highestAvg = 0;
+            Object.keys(areaScores).forEach(area => {
+                const avg = areaScores[area].reduce((a, b) => a + b, 0) / areaScores[area].length;
+                if (avg > highestAvg) {
+                    highestAvg = avg;
+                    strongestArea = area;
+                }
+            });
+            
+            // Update displays
+            document.getElementById('overallScore').textContent = `${avgScore}/10`;
+            document.getElementById('avgScore').textContent = avgScore;
+            document.getElementById('questionsAnswered').textContent = answers.length;
+            document.getElementById('topScore').textContent = topScore;
+            document.getElementById('strongestArea').textContent = strongestArea;
+            
+            // Set performance badge
+            const performanceBadge = document.getElementById('performanceBadge');
+            if (parseFloat(avgScore) >= 8) {
+                performanceBadge.textContent = '🏆 Excellent Performance';
+                performanceBadge.style.background = 'rgba(39, 174, 96, 0.3)';
+            } else if (parseFloat(avgScore) >= 6) {
+                performanceBadge.textContent = '👍 Good Performance';
+                performanceBadge.style.background = 'rgba(243, 156, 18, 0.3)';
+            } else {
+                performanceBadge.textContent = '📈 Room for Improvement';
+                performanceBadge.style.background = 'rgba(231, 76, 60, 0.3)';
+            }
+            
+            // Color code overall score
+            const overallScoreElement = document.getElementById('overallScore');
+            if (parseFloat(avgScore) >= 8) {
+                overallScoreElement.style.color = '#27ae60';
+            } else if (parseFloat(avgScore) >= 6) {
+                overallScoreElement.style.color = '#f39c12';
+            } else {
+                overallScoreElement.style.color = '#e74c3c';
+            }
+            
+            // Populate questions
+            const questionsList = document.getElementById('questionsList');
+            answers.forEach((answer, index) => {
+                const questionCard = createQuestionCard(answer, index + 1);
+                questionsList.appendChild(questionCard);
+            });
+        }
+        
+        function createQuestionCard(answer, questionNumber) {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            
+            // Color code score
+            let scoreColor = '#e74c3c';
+            if (answer.score >= 8) scoreColor = '#27ae60';
+            else if (answer.score >= 6) scoreColor = '#f39c12';
+            
+            card.innerHTML = `
+                <div class="question-header">
+                    <div class="question-type">${answer.question.type}</div>
+                    <div class="question-score" style="color: ${scoreColor}; border-color: ${scoreColor};">
+                        ${answer.score}/10
+                    </div>
+                </div>
+                
+                <div class="question-text">
+                    <strong>Q${questionNumber}:</strong> ${answer.question.question}
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-label">Your Answer:</div>
+                    <div class="answer-text">"${answer.answer}"</div>
+                </div>
+                
+                <div class="feedback-section">
+                    <div class="answer-label">AI Feedback:</div>
+                    <div class="feedback-text">${answer.feedback}</div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', initResults);
+        
+        // Clear session data when starting new interview
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            sessionStorage.clear();
+        });
+    </script>
+</body>
+</html>

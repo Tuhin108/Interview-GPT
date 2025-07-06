@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InterviewGPT - Mock Interview Practice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            color: #667eea;
+            margin-top: 1rem;
+        }
+        
+        .error {
+            color: #e74c3c;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .examples {
+            margin-top: 1.5rem;
+            text-align: left;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .examples h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .examples ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .examples li {
+            color: #666;
+            margin-bottom: 0.3rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+        
+        .examples li:before {
+            content: "•";
+            color: #667eea;
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 InterviewGPT</h1>
+        <p class="subtitle">Practice mock interviews with AI-powered feedback</p>
+        
+        <form id="roleForm">
+            <div class="form-group">
+                <label for="role">What role are you interviewing for?</label>
+                <input type="text" id="role" name="role" placeholder="e.g., Frontend Developer, Data Scientist, Product Manager" required>
+            </div>
+            
+            <button type="submit" class="btn" id="startBtn">
+                Start Interview
+            </button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <p>🤖 Generating your personalized interview questions...</p>
+        </div>
+        
+        <div class="error" id="error">
+            <p>Something went wrong. Please try again.</p>
+        </div>
+        
+        <div class="examples">
+            <h3>Popular Roles:</h3>
+            <ul>
+                <li>Software Engineer</li>
+                <li>Data Analyst</li>
+                <li>UX Designer</li>
+                <li>Marketing Manager</li>
+                <li>Sales Representative</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('roleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const roleInput = document.getElementById('role');
+            const startBtn = document.getElementById('startBtn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            const role = roleInput.value.trim();
+            
+            if (!role) {
+                alert('Please enter a role to interview for.');
+                return;
+            }
+            
+            // Show loading state
+            startBtn.disabled = true;
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            
+            try {
+                const response = await fetch('/generate_questions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ role: role })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Store questions and role in sessionStorage
+                sessionStorage.setItem('questions', JSON.stringify(data.questions));
+                sessionStorage.setItem('role', role);
+                sessionStorage.setItem('currentQuestion', '0');
+                sessionStorage.setItem('answers', JSON.stringify([]));
+                
+                // Redirect to interview page
+                window.location.href = '/interview';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                error.textContent = err.message || 'Failed to generate questions. Please try again.';
+                error.style.display = 'block';
+                startBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+        
+        // Clear any existing session data when page loads
+        window.addEventListener('load', function() {
+            sessionStorage.removeItem('questions');
+            sessionStorage.removeItem('role');
+            sessionStorage.removeItem('currentQuestion');
+            sessionStorage.removeItem('answers');
+        });
+    </script>
+</body>
+</html>
