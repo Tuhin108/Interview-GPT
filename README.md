@@ -298,8 +298,6 @@ We welcome contributions! Here's how you can help:
 
 **Made with ❤️ by Tuhin, for Engineers**
 
-*Ready to transform your interview skills? [Get Started Now!](http://localhost:5000)*
-
 </div>
 
 ---
